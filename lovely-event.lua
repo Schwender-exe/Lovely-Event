@@ -1,4 +1,4 @@
-local EventSystem = {
+local LovelyEvent = {
   events = {}, -- list of all events
   eventQueue = {},
   waitTimer = 0,
@@ -6,16 +6,18 @@ local EventSystem = {
   loopedEvent = false, -- if event is looped
 }
 -- -- --
-function EventSystem.new()
-  local e = setmetatable( EventSystem, { __index = EventSystem } )
+function LovelyEvent.new()
+  local e = setmetatable( LovelyEvent, { __index = LovelyEvent } )
   e:loadDefaultEvents()
   return e
 end
 -- -- --
+function LovelyEvent:isRunning() return #self.eventQueue > 0 or self.waitTimer > 0 end
+-- -- --
 
 
 -- -- --
-function EventSystem:update( dt )
+function LovelyEvent:update( dt )
   if self.waitTimer > 0 then
     self.waitTimer = self.waitTimer - dt
   else
@@ -32,22 +34,21 @@ end
 
 
 -- -- --
-function EventSystem:loadDefaultEvents()
+function LovelyEvent:loadDefaultEvents()
   self:newEvent( "wait", function( vars, looped ) self.waitTimer = vars return true end )
   self:newEvent( "print", function( vars, looped ) print( vars ) return true end )
 end
 -- -- --
-function EventSystem:queueEvent( name, ... )
+function LovelyEvent:queueEvent( name, ... )
   local vars = {...} if #vars == 1 then vars = vars[1] end
   table.insert( self.eventQueue, {name=name,vars=vars} )
 end
 -- -- --
-function EventSystem:newEvent( name, func )
+function LovelyEvent:newEvent( name, func )
   self.events[name] = func
-  --print( "loaded event \""..name.."\"" )
 end
 -- -- --
 
 
 -- -- --
-return EventSystem
+return LovelyEvent.new()
